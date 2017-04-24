@@ -5,8 +5,14 @@ DIR = ARGV[0]
 FILENAME_BACKGROUND = "artist-background"
 FILENAME_POSTER = "artist-poster"
 
+def timestamp
+  DateTime.now.strftime("%d/%m/%Y %H:%M")
+end
+
 Dir.chdir(DIR)
 folders = Dir.glob('**/*').select {|f| File.directory? f}
+
+puts timestamp() + ">Beginning plex-auto-artwork.."
 
 folders.each do |folder|
   contains_music      = Dir.glob(folder + '/*.{mp3,flac}').count > 0
@@ -18,8 +24,10 @@ folders.each do |folder|
     FileUtils.cp(File.path(largest), File.dirname(largest) + "/" + FILENAME_BACKGROUND + File.extname(largest)) unless contains_background
     FileUtils.cp(File.path(largest), File.dirname(largest) + "/" + FILENAME_POSTER + File.extname(largest)) unless contains_poster
     
-    timestamp = DateTime.now.strftime("%d/%m/%Y %H:%M")
-    puts timestamp + ">Created background in '#{folder}'" unless contains_background
-    puts timestamp + ">Created poster in '#{folder}'"     unless contains_poster
+    puts timestamp() + ">Created background in '#{folder}'" unless contains_background
+    puts timestamp() + ">Created poster in '#{folder}'"     unless contains_poster
   end
 end
+
+puts timestamp() + ">Ending plex-auto-artwork.."
+puts timestamp() + "---------------------------"
