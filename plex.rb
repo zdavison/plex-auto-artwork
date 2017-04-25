@@ -9,15 +9,24 @@ def timestamp
   DateTime.now.strftime("%d/%m/%Y %H:%M")
 end
 
+def escape_glob(s)
+  s.gsub(/[\\\{\}\[\]\*\?]/) { |x| "\\"+x }
+end
+
 Dir.chdir(DIR)
 folders = Dir.glob('**/*').select {|f| File.directory? f}
 
 puts timestamp() + ">Beginning plex-auto-artwork.."
 
 folders.each do |folder|
-  contains_music      = Dir.glob(folder + '/*.{mp3,flac}').count > 0
-  contains_background = Dir.glob(folder + '/' + FILENAME_BACKGROUND + ".{jpg,jpeg}").count > 0
-  contains_poster     = Dir.glob(folder + '/' + FILENAME_POSTER + ".{jpg,jpeg}").count > 0
+
+	mp3_glob 				= escape_glob(folder + '/*.{mp3,flac}')
+	background_glob	= escape_glob(folder + '/' + FILENAME_BACKGROUND + ".{jpg,jpeg}")
+	poster_glob			= escape_glob(folder + '/' + FILENAME_POSTER + ".{jpg,jpeg}")
+
+  contains_music      = Dir.glob(mp3_glob).count > 0
+  contains_background = Dir.glob(background_glob).count > 0
+  contains_poster     = Dir.glob(poster_glob).count > 0
 
   if contains_music then
     largest = Dir.glob(folder + '/*.{jpg,jpeg}').sort_by{ |image| File.size?(image) }.last
@@ -30,4 +39,3 @@ folders.each do |folder|
 end
 
 puts timestamp() + ">Ending plex-auto-artwork.."
-puts timestamp() + "---------------------------"
